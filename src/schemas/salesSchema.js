@@ -8,6 +8,7 @@ const salesSchema = joi.object({
     paymentMethod: joi.string().valid('money', 'credit', 'debit').required(),
     total: joi.number().min(0).required(),
     time: joi.number().required(),
+    idUser: joi.string().required()
 });
 
 export default salesSchema;
