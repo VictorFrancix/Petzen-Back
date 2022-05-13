@@ -35,7 +35,7 @@ export async function getSales(req, res) {
         sales.forEach(sale => {
             if(Date.now() - sale.time < 600000){
                 sale.status = 'aceito';
-            } else if(Date.now() - sale.time < 3,6e+6){
+            } else if(Date.now() - sale.time < 36000000){
                 sale.status = 'a caminho';
             } else {
                 sale.status = 'entregue';
