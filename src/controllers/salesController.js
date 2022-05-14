@@ -1,50 +1,82 @@
-import db from './../db.js';
-import salesSchema from './../schemas/salesSchema.js';
+import db from "./../db.js";
+import salesSchema from "./../schemas/salesSchema.js";
 
 export async function sendSale(req, res) {
     const body = req.body;
+    const { authorization } = req.headers;
+    const token = authorization?.replace("Bearer ", "");
 
-    // TODO: autenticação e adicionar idUser
+    const validation = salesSchema.validate(body, { abortEarly: false });
 
-    const validation = salesSchema.validate(body, {abortEarly: false});
-    
-    if(validation.error){
-        console.log(validation.error.details.map(detail => detail.message));
+    if (validation.error) {
+        console.log(validation.error.details.map((detail) => detail.message));
         res.sendStatus(422);
         return;
     }
 
-    try{
-        await db.collection('sales').insertOne(body);
-        res.sendStatus(201);
+    try {
+        const session = await db.collection("sessions").findOne({ token });
 
-    } catch(err){
+        if (!session) {
+            res.sendStatus(401);
+            return;
+        }
+
+        const user = await db
+            .collection("users")
+            .findOne({ _id: session.userId });
+
+        if (!user) {
+            res.sendStatus(404);
+            return;
+        }
+
+        await db.collection("sales").insertOne(body);
+        res.sendStatus(201);
+    } catch (err) {
         console.log(err);
         res.sendStatus(500);
     }
 }
 
 export async function getSales(req, res) {
-    const {idUser} = req.params
+    const { authorization } = req.headers;
+    const token = authorization?.replace("Bearer ", "");
+    
+    try {
+        const session = await db.collection("sessions").findOne({ token });
 
-    // TODO: autenticação 
+        if (!session) {
+            res.sendStatus(401);
+            return;
+        }
 
-    try{
-        const sales = await db.collection('sales').find({idUser}).toArray();
+        const user = await db
+            .collection("users")
+            .findOne({ _id: session.userId });
 
-        sales.forEach(sale => {
-            if(Date.now() - sale.time < 600000){
-                sale.status = 'aceito';
-            } else if(Date.now() - sale.time < 36000000){
-                sale.status = 'a caminho';
+        if (!user) {
+            res.sendStatus(404);
+            return;
+        }
+
+        const sales = await db
+            .collection("sales")
+            .find({ idUser: user._id })
+            .toArray();
+
+        sales.forEach((sale) => {
+            if (Date.now() - sale.time < 600000) {
+                sale.status = "aceito";
+            } else if (Date.now() - sale.time < 36000000) {
+                sale.status = "a caminho";
             } else {
-                sale.status = 'entregue';
+                sale.status = "entregue";
             }
         });
 
         res.status(200).send(sales);
-
-    } catch(err){
+    } catch (err) {
         console.log(err);
         res.sendStatus(500);
     }

@@ -6,6 +6,6 @@ const salesRouter = express.Router();
 
 salesRouter.post("/sales", sendSale);
 
-salesRouter.get("/sales/:idUser", getSales);
+salesRouter.get("/sales", getSales);
 
 export default salesRouter;
