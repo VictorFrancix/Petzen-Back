@@ -59,7 +59,6 @@ export async function login (req, res) {
         name,
         email,
         password: hash,
-        registry: [] 
       });
       res.sendStatus(201);
       console.log(db.collection("users").findOne({email}));
