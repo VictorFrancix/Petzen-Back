@@ -31,6 +31,8 @@ export async function sendSale(req, res) {
             return;
         }
 
+        body.idUser = user._id;
+
         await db.collection("sales").insertOne(body);
         res.sendStatus(201);
     } catch (err) {
@@ -67,11 +69,11 @@ export async function getSales(req, res) {
 
         sales.forEach((sale) => {
             if (Date.now() - sale.time < 600000) {
-                sale.status = "aceito";
-            } else if (Date.now() - sale.time < 36000000) {
-                sale.status = "a caminho";
+                sale.status = "Aceito";
+            } else if (Date.now() - sale.time < 3600000) {
+                sale.status = "A caminho";
             } else {
-                sale.status = "entregue";
+                sale.status = "Entregue";
             }
         });
 
