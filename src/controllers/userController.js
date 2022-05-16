@@ -165,8 +165,7 @@ export async function logout(req, res) {
     try {
         
         const session = await db.collection("sessions").findOne({ token });
-        console.log;
-
+        
         if (!session) {
             res.sendStatus(401);
             return;
