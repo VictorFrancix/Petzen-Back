@@ -73,25 +73,8 @@ export async function signUp(req, res) {
 };
 
 export async function getUser(req, res) {
-    const { authorization } = req.headers;
-    const token = authorization?.replace("Bearer ", "");
-
     try {
-        const session = await db.collection("sessions").findOne({ token });
-
-        if (!session) {
-            res.sendStatus(401);
-            return;
-        }
-
-        const user = await db
-            .collection("users")
-            .findOne({ _id: session.userId });
-
-        if (!user) {
-            res.sendStatus(404);
-            return;
-        }
+        const {user} = res.locals;
 
         delete user.password;
         delete user._id;
@@ -104,9 +87,6 @@ export async function getUser(req, res) {
 };
 
 export async function editUser(req, res) {
-    const { authorization } = req.headers;
-    const token = authorization?.replace("Bearer ", "");
-
     const body = req.body;
 
     const validate = editUserSchema.validate(body, { abortEarly: false });
@@ -124,21 +104,7 @@ export async function editUser(req, res) {
     };
 
     try {
-        const session = await db.collection("sessions").findOne({ token });
-
-        if (!session) {
-            res.sendStatus(401);
-            return;
-        }
-
-        const user = await db
-            .collection("users")
-            .findOne({ _id: session.userId });
-
-        if (!user) {
-            res.sendStatus(404);
-            return;
-        }
+        const {user} = res.locals;
 
         if (user && bcrypt.compareSync(body.password, user.password)) {
             user.name = newUser.name;
@@ -160,26 +126,7 @@ export async function logout(req, res) {
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
 
-    
-
     try {
-        
-        const session = await db.collection("sessions").findOne({ token });
-        
-        if (!session) {
-            res.sendStatus(401);
-            return;
-        }
-
-        const user = await db
-            .collection("users")
-            .findOne({ _id: session.userId });
-
-        if (!user) {
-            res.sendStatus(404);
-            return;
-        }
-
         await db.collection("sessions").deleteOne({ token });
         res.sendStatus(200);
     } catch (err) {

@@ -3,8 +3,6 @@ import salesSchema from "./../schemas/salesSchema.js";
 
 export async function sendSale(req, res) {
     const body = req.body;
-    const { authorization } = req.headers;
-    const token = authorization?.replace("Bearer ", "");
 
     const validation = salesSchema.validate(body, { abortEarly: false });
 
@@ -15,21 +13,7 @@ export async function sendSale(req, res) {
     }
 
     try {
-        const session = await db.collection("sessions").findOne({ token });
-
-        if (!session) {
-            res.sendStatus(401);
-            return;
-        }
-
-        const user = await db
-            .collection("users")
-            .findOne({ _id: session.userId });
-
-        if (!user) {
-            res.sendStatus(404);
-            return;
-        }
+        const {user} = res.locals;
 
         body.idUser = user._id;
 
@@ -42,26 +26,8 @@ export async function sendSale(req, res) {
 }
 
 export async function getSales(req, res) {
-    const { authorization } = req.headers;
-    const token = authorization?.replace("Bearer ", "");
-    
     try {
-        const session = await db.collection("sessions").findOne({ token });
-
-        if (!session) {
-            res.sendStatus(401);
-            return;
-        }
-
-        const user = await db
-            .collection("users")
-            .findOne({ _id: session.userId });
-
-        if (!user) {
-            res.sendStatus(404);
-            return;
-        }
-
+        const {user} = res.locals;
         const sales = await db
             .collection("sales")
             .find({ idUser: user._id })
