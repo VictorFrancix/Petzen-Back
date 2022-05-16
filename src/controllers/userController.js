@@ -27,7 +27,7 @@ export async function login (req, res) {
                   token,
               });
   
-              res.status(200).send(token);
+              res.status(200).send(token, user.name);
           } else {
               res.sendStatus(401);
           }
