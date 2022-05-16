@@ -51,8 +51,8 @@ export async function login (req, res) {
                   userId: user._id,
                   token,
               });
-  
-              res.status(200).send(token, user.name);
+              const name = user.name;
+              res.status(200).send(token, name);
           } else {
               res.sendStatus(401);
           }
