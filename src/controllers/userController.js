@@ -4,30 +4,6 @@ import { v4 as uuid } from "uuid";
 import db from "./../db.js";
 import { loginSchema, signUpSchema, editUserSchema } from "../schemas/userSchemas.js";
 
-async function validateToken(token) {
-    try {
-        const session = await db.collection("sessions").findOne({ token });
-        console.log;
-
-        if (!session) {
-            res.sendStatus(401);
-            return;
-        }
-
-        const user = await db
-            .collection("users")
-            .findOne({ _id: session.userId });
-
-        if (!user) {
-            res.sendStatus(404);
-            return;
-        }
-
-    } catch (e) {
-        console.log(e);
-        res.sendStatus(500);
-    }
-}
 
 export async function login(req, res) {
     const body = req.body;
@@ -184,9 +160,26 @@ export async function logout(req, res) {
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
 
-    validateToken(token);
+    
 
     try {
+        
+        const session = await db.collection("sessions").findOne({ token });
+        
+        if (!session) {
+            res.sendStatus(401);
+            return;
+        }
+
+        const user = await db
+            .collection("users")
+            .findOne({ _id: session.userId });
+
+        if (!user) {
+            res.sendStatus(404);
+            return;
+        }
+
         await db.collection("sessions").deleteOne({ token });
         res.sendStatus(200);
     } catch (err) {
