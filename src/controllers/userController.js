@@ -4,6 +4,31 @@ import { v4 as uuid } from "uuid";
 import db from "./../db.js";
 import { loginSchema, signUpSchema } from "../schemas/userSchemas.js";
 
+function validateToken(token){
+  try {
+    const session = await db.collection("sessions").findOne({ token });
+    console.log;
+
+    if (!session) {
+        res.sendStatus(401);
+        return;
+    }
+
+    const user = await db
+        .collection("users")
+        .findOne({ _id: session.userId });
+
+    if (!user) {
+        res.sendStatus(404);
+        return;
+    }
+
+} catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+}
+}
+
 
 export async function login (req, res) {
     const body = req.body;
@@ -26,8 +51,8 @@ export async function login (req, res) {
                   userId: user._id,
                   token,
               });
-  
-              res.status(200).send(token);
+              const name = user.name;
+              res.status(200).send(token, name);
           } else {
               res.sendStatus(401);
           }
@@ -66,4 +91,19 @@ export async function login (req, res) {
       res.sendStatus(500);
     }
     
+  };
+
+  export async function logout(req, res){
+    const { authorization } = req.headers;
+    const token = authorization?.replace("Bearer ", "");
+
+    validateToken(token);
+
+    try{
+        await db.collection("sessions").deleteOne({token});
+        res.sendStatus(200);
+    } catch (err) {
+        console.log(err);
+        res.sendStatus(500);
+    }
   };
