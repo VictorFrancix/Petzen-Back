@@ -1,14 +1,21 @@
 import express from "express";
 import { validateToken } from "./../middlewares/authMiddleware.js";
 
-import {sendSale, getSales} from './../controllers/salesController.js';
+import { sendSale, getSales } from "./../controllers/salesController.js";
+import { validateSchema } from "./../middlewares/joiValidationMiddleware.js";
+import salesSchema from "./../schemas/salesSchema.js";
 
 const salesRouter = express.Router();
 
-salesRouter.use(validateToken);
+salesRouter.post(
+    "/sales",
+    validateToken,
+    (req, res, next) => {
+        validateSchema(req, res, next, salesSchema);
+    },
+    sendSale
+);
 
-salesRouter.post("/sales", sendSale);
-
-salesRouter.get("/sales", getSales);
+salesRouter.get("/sales", validateToken, getSales);
 
 export default salesRouter;

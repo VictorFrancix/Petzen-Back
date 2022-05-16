@@ -1,16 +1,7 @@
 import db from "./../db.js";
-import salesSchema from "./../schemas/salesSchema.js";
 
 export async function sendSale(req, res) {
     const body = req.body;
-
-    const validation = salesSchema.validate(body, { abortEarly: false });
-
-    if (validation.error) {
-        console.log(validation.error.details.map((detail) => detail.message));
-        res.sendStatus(422);
-        return;
-    }
 
     try {
         const {user} = res.locals;
