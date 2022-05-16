@@ -45,48 +45,6 @@ export async function login(req, res) {
             .collection("users")
             .findOne({ email: body.email });
 
-<<<<<<< HEAD
-  export async function getUser (req, res) {
-    const { authorization } = req.headers;
-    const token = authorization?.replace("Bearer ", "");
-
-    try{
-      const session = await db.collection("sessions").findOne({ token });
-
-        if (!session) {
-            res.sendStatus(401);
-            return;
-        }
-
-        const user = await db
-            .collection("users")
-            .findOne({ _id: session.userId });
-
-        if (!user) {
-            res.sendStatus(404);
-            return;
-        }
-
-        delete user.password;
-        delete user._id;
-
-        res.status(200).send(user);
-    } catch (err) {
-      console.log(err);
-      res.sendStatus(500);
-    }
-  };
-
-  export async function editUser(req, res){
-    const { authorization } = req.headers;
-    const token = authorization?.replace("Bearer ", "");
-
-    const body = req.body;
-
-    const validate = editUserSchema.validate(body, {abortEarly: false});
-
-    if(validate.error){
-=======
         if (user && bcrypt.compareSync(body.password, user.password)) {
             const token = uuid();
             await db.collection("sessions").insertOne({
@@ -114,56 +72,11 @@ export async function signUp(req, res) {
     const validate = signUpSchema.validate({ email, password, name }, { abortEarly: false });
 
     if (validate.error) {
->>>>>>> a61e5a7 (Fix login issues)
         console.log(validate.error.details.map(detail => detail.message));
         res.sendStatus(422);
         return;
     }
 
-<<<<<<< HEAD
-    const newUser = {
-      email: body.change.email ? body.new.email : body.email,
-      name: body.change.name ? body.new.name : body.name,
-      password: body.change.password ? body.new.password : body.password
-    };
-
-    try{
-      const session = await db.collection("sessions").findOne({ token });
-
-        if (!session) {
-            res.sendStatus(401);
-            return;
-        }
-
-        const user = await db
-            .collection("users")
-            .findOne({ _id: session.userId });
-
-        if (!user) {
-            res.sendStatus(404);
-            return;
-        }
-
-        if(user && bcrypt.compareSync(body.password, user.password)){
-          user.name = newUser.name;
-          user.email = newUser.email;
-          user.password = bcrypt.hashSync(newUser.password, 10);
-          await db.collection('users').updateOne({_id: user._id}, {$set: user});
-          res.sendStatus(201);
-        } else{
-          res.sendStatus(401);
-        }
-
-
-
-        
-    } catch (err) {
-      console.log(err);
-      res.sendStatus(500);
-    }
-  }
-  export async function logout(req, res){
-=======
     try {
         const user = await db.collection("users").findOne({ email });
         if (user) {
@@ -185,7 +98,6 @@ export async function signUp(req, res) {
 };
 
 export async function logout(req, res) {
->>>>>>> a61e5a7 (Fix login issues)
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
 
@@ -198,8 +110,4 @@ export async function logout(req, res) {
         console.log(err);
         res.sendStatus(500);
     }
-<<<<<<< HEAD
-  };
-=======
 };
->>>>>>> a61e5a7 (Fix login issues)
