@@ -29,7 +29,6 @@ async function validateToken(token) {
     }
 }
 
-
 export async function login(req, res) {
     const body = req.body;
     const validate = loginSchema.validate(body, { abortEarly: false });
