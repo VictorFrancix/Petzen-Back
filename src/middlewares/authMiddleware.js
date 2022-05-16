@@ -1,3 +1,5 @@
+import db from "./../db.js";
+
 export async function validateToken(req, res, next) {
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
@@ -18,7 +20,6 @@ export async function validateToken(req, res, next) {
             res.sendStatus(404);
             return;
         }
-
         res.locals.user = user;
         next();
     } catch (err) {
