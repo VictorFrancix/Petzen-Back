@@ -2,7 +2,7 @@ import joi from 'joi';
 
 const salesSchema = joi.object({
     products: joi.array().items(joi.object({
-        idProduct: joi.string().required(),
+        product: joi.string().required(),
         quantity: joi.number().integer().min(1).required(),
     }).required()).required(),
     paymentMethod: joi.string().valid('money', 'credit', 'debit').required(),
