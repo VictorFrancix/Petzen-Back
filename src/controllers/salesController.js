@@ -75,6 +75,8 @@ export async function getSales(req, res) {
             } else {
                 sale.status = "Entregue";
             }
+            
+            delete sale.idUser;
         });
 
         res.status(200).send(sales);
